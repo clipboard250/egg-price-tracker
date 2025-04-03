@@ -1,9 +1,9 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const years = ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025"];
   const quarters = ["Q1","Q2","Q3","Q4"];
-  const states = ["US Average","California","Florida","Texas"];
+  const states = ["US Average","California","Florida","Texas","New York","Illinois","Colorado"];
 
+  // Populate dropdowns
   years.forEach(y => {
     let opt = document.createElement("option");
     opt.value = y;
@@ -25,49 +25,94 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("state").appendChild(opt);
   });
 
-  // Graph logic
-  window.getData = function () {
+  // Set default to most recent
+  document.getElementById("year").value = "2025";
+  document.getElementById("quarter").value = "Q2";
+  document.getElementById("state").value = "US Average";
+
+  fetch("egg_prices_2016_2025.csv")
+    .then(response => response.text())
+    .then(csv => {
+      const rows = csv.trim().split("\n").map(r => r.split(","));
+      const headers = rows[0];
+      const data = rows.slice(1).map(r => {
+        let obj = {};
+        headers.forEach((h, i) => {
+          obj[h] = i === 0 ? r[i] : parseFloat(r[i]);
+        });
+        return obj;
+      });
+
+      drawChart(data);
+      updatePrice(data);
+
+      document.getElementById("getData").addEventListener("click", () => {
+        updatePrice(data);
+      });
+    });
+
+  function updatePrice(data) {
     const year = document.getElementById("year").value;
     const quarter = document.getElementById("quarter").value;
     const state = document.getElementById("state").value;
-    const ctx = document.getElementById("priceChart").getContext("2d");
-    const label = document.getElementById("graph-label");
+    const selected = `${year}-${quarter}`;
 
-    label.textContent = `Egg prices for ${state}, ${quarter}-${year}`;
+    const found = data.find(row => row.Quarter === selected);
+    const output = document.getElementById("priceOutput");
 
-    if (window.chartInstance) {
-      window.chartInstance.destroy();
+    if (found) {
+      output.innerText = `Egg prices for ${state}, ${selected}: $${found[state].toFixed(2)} per dozen.`;
+    } else {
+      output.innerText = `No data available for ${state}, ${selected}.`;
     }
+  }
 
-    window.chartInstance = new Chart(ctx, {
+  function drawChart(data) {
+    const ctx = document.getElementById("priceChart").getContext("2d");
+    const quarters = data.map(row => row.Quarter);
+    const prices = data.map(row => row["US Average"]);
+
+    new Chart(ctx, {
       type: "line",
       data: {
-        labels: ["2016-Q1","2017-Q1","2018-Q1","2019-Q1","2020-Q1","2021-Q1","2022-Q1","2023-Q1","2024-Q1","2025-Q1"],
+        labels: quarters,
         datasets: [{
           label: "Egg price $ (per dozen)",
-          data: [2.3,1.4,1.9,1.6,2.2,2.6,3.0,4.2,3.3,5.0],
-          borderColor: "#ffcc00",
-          borderWidth: 2,
-          tension: 0.4,
-          fill: false
+          data: prices,
+          fill: false,
+          borderColor: "#facc15", // yellow
+          tension: 0.3,
+          pointBackgroundColor: "#facc15"
         }]
       },
       options: {
         responsive: true,
         scales: {
           y: {
-            beginAtZero: false
+            beginAtZero: false,
+            min: 1,
+            max: 6,
+            title: {
+              display: true,
+              text: "$ per dozen"
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Quarter"
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: "#444"
+            }
           }
         }
       }
     });
-  };
-
-  // Toggle FAQ
-  document.querySelectorAll(".accordion-toggle").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const content = btn.nextElementSibling;
-      content.style.display = content.style.display === "block" ? "none" : "block";
-    });
-  });
+  }
 });
+
