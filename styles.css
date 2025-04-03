@@ -1,398 +1,52 @@
-/* Ensure Fonts Stay Archivo Black & Montserrat Globally */
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@400;500;700&display=swap');
 
 body {
-    font-family: 'Montserrat', sans-serif !important;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
+  font-family: 'Archivo', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
+  color: #222;
 }
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Archivo Black', sans-serif !important;
-}
-
-h2 {
-    font-weight: normal; /* Reduce thickness of subheadings */
-}
-
-p, button, select, details, summary {
-    font-family: 'Montserrat', sans-serif !important;
-}
-
-/* Style the Banner */
 header {
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+  padding: 1rem;
+  text-align: center;
+  background: #fdf6d4;
 }
-
-header h1 {
-    text-align: center;
-    margin: 0;
-    font-size: 2.5em;
-    color: #333;
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
-
-/* Style the Search Tool */
-#controls {
-    text-align: center;
-    margin: 20px 0;
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+select, button {
+  padding: 0.5rem;
+  font-size: 1rem;
 }
-
-#controls label {
-    font-weight: bold;
-    margin-right: 10px;
+#egg-graph {
+  padding: 2rem;
+  background: #fff;
 }
-
-select {
-    font-size: 16px;
-    padding: 10px 30px 10px 10px;
-    border: 2px solid #F4B266;
-    border-radius: 5px;
-    background-color: #FFF9E6;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    transition: border-color 0.3s ease;
-    margin: 5px;
-}
-
-select:hover {
-    border-color: #E89F4F;
-}
-
-/* Wrapper for custom arrow */
-.select-wrapper {
-    position: relative;
-    display: inline-block;
-}
-
-.select-wrapper::after {
-    content: '▼';
-    font-size: 14px;
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #F4B266;
-}
-
-#controls button {
-    background-color: #F4B266;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    margin: 5px;
-}
-
-#controls button:hover {
-    background-color: #E89F4F;
-    transform: scale(1.05);
-}
-
-#controls button:active {
-    transform: scale(0.95);
-}
-
-/* Restore Graph Layout & Background */
-#chart-container {
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
-    width: 100%;
-    margin: 20px auto;
-    position: relative;
-}
-
-/* Loading Animation for Graph */
-#chart-container.loading::before {
-    content: '🍳 Loading...';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    color: #F4B266;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* Make Graph Line Bolder */
-.chartjs-render-monitor {
-    stroke-width: 3px !important; /* Makes the graph line bolder */
-}
-
-/* Reduce White Background Around Graph */
 canvas {
-    background: transparent !important;
+  max-width: 100%;
 }
-
-/* Reposition FAQ on Left and Results on Right */
-@media (min-width: 1024px) {
-    #content-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding: 20px;
-        gap: 20px; /* Adds a small gap between the cards */
-    }
-    
-    #faq {
-        width: 48%;
-        background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    #results-container {
-        width: 48%;
-    }
-    
-    #chart-container {
-        width: 100%;
-    }
+.faq-section {
+  padding: 2rem;
 }
-
-/* Ensure Responsive Design with Graph Above FAQ on Mobile */
-@media (max-width: 768px) {
-    #content-container {
-        display: flex;
-        flex-direction: column;
-    }
-
-    #results-container {
-        order: -1; /* Ensures graph results appear first */
-        width: 90%;
-        margin: auto;
-    }
-
-    #faq {
-        order: 0; /* Ensures FAQ appears after graph */
-        width: 90%;
-        margin: 20px auto;
-    }
-
-    #chart-container {
-        width: 90%;
-        margin: auto;
-    }
-
-    #controls {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 30px; /* More padding for breathing room */
-    }
-
-    #controls label {
-        margin-bottom: 5px; /* Add space below labels */
-    }
-
-    .select-wrapper {
-        margin-bottom: 20px; /* More space between dropdowns */
-        width: 100%;
-        max-width: 300px; /* Match the dropdown width */
-    }
-
-    select {
-        width: 100%; /* Ensure dropdowns take full width of their container */
-    }
-
-    #controls button {
-        width: 100%;
-        max-width: 300px; /* Match the dropdown width */
-        margin-top: 10px; /* Add space above the button */
-    }
+.accordion-toggle {
+  background: #eee;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem;
+  font-weight: bold;
 }
-
-/* Simplify Mobile Graph: Increase Spacing and Reduce Data Points */
-@media (max-width: 768px) {
-    #chart-container canvas {
-        max-height: 200px; /* Reduces graph height on mobile */
-        overflow: hidden; /* Hides excess data points */
-    }
-
-    /* Increase spacing between data points by reducing the number of labels */
-    .chartjs-render-monitor {
-        font-size: 10px; /* Smaller font for labels */
-    }
+.accordion-content {
+  display: none;
+  padding: 0.75rem;
+  background: #fafafa;
 }
-
-/* Modern Card Style for FAQ */
-#faq {
-    margin: 20px auto;
-    width: 85%;
-}
-
-#faq h2 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-details {
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 15px;
-    padding: 15px;
-    transition: all 0.3s ease;
-}
-
-details:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-summary {
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 18px;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-summary::after {
-    content: "+";
-    font-size: 18px;
-    font-weight: bold;
-    transition: transform 0.3s ease;
-}
-
-details[open] summary::after {
-    content: "−";
-}
-
-details p {
-    margin-top: 10px;
-    padding: 10px;
-    line-height: 1.6;
-}
-
-/* Style the Submit Prices Section */
-#submit-prices {
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    border-radius: 10px;
-    padding: 20px;
-    margin: 20px auto;
-    width: 85%;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-/* Style the Buttons */
-.button-container {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.submit-button {
-    padding: 10px 20px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    text-decoration: none;
-    color: white;
-}
-
-.email-button {
-    background: #F4B266; /* Match #controls button */
-}
-
-.email-button:hover {
-    background: #E89F4F; /* Match #controls button hover */
-    transform: scale(1.05);
-}
-
-.github-button {
-    background: #F4B266; /* Match #controls button */
-}
-
-.github-button:hover {
-    background: #E89F4F; /* Match #controls button hover */
-    transform: scale(1.05);
-}
-
-/* Style the Disclaimer */
-.disclaimer {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 14px;
-    color: #333;
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Footer Styling */
 footer {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(to bottom, #FFF9E6, #FFD966);
-    margin-top: 20px;
-}
-
-footer p {
-    margin: 5px 0;
-}
-
-/* Ensure Readability in Dark Mode */
-@media (prefers-color-scheme: dark) {
-    body {
-        background: linear-gradient(to bottom, #333, #555);
-        color: #F5F5F5;
-    }
-
-    #controls, #faq, #submit-prices {
-        background: linear-gradient(to bottom, #555, #777); /* Lighten to match disclaimer */
-        color: #F5F5F5;
-    }
-
-    #chart-container {
-        background: linear-gradient(to bottom, #555, #777); /* Lighten to match disclaimer */
-    }
-
-    select {
-        background-color: #555;
-        color: #F5F5F5;
-        border-color: #F4B266;
-    }
-
-    details {
-        background: linear-gradient(to bottom, #555, #777); /* Lighten to match disclaimer */
-        color: #F5F5F5;
-    }
-
-    footer {
-        background: linear-gradient(to bottom, #555, #777); /* Lighten to match disclaimer */
-        color: #F5F5F5;
-    }
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #555;
 }
