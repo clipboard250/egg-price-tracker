@@ -1,101 +1,117 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const years = ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025"];
-  const quarters = ["Q1","Q2","Q3","Q4"];
-  const states = ["US Average","California","Florida","Texas","New York","Illinois","Colorado"];
+  const yearSelect = document.getElementById("year");
+  const quarterSelect = document.getElementById("quarter");
+  const stateSelect = document.getElementById("state");
+  const getDataBtn = document.getElementById("getData");
+  const chartCanvas = document.getElementById("eggChart");
+  const priceOutput = document.getElementById("price-output");
 
-  // Populate dropdowns
-  years.forEach(y => {
-    let opt = document.createElement("option");
-    opt.value = y;
-    opt.textContent = y;
-    document.getElementById("year").appendChild(opt);
+  if (!yearSelect || !quarterSelect || !stateSelect || !getDataBtn || !chartCanvas || !priceOutput) {
+    console.warn("One or more DOM elements not found.");
+    return;
+  }
+
+  const years = ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
+  const quarters = ["Q1", "Q2", "Q3", "Q4"];
+  const states = ["US Average", "California", "Florida", "Texas"];
+
+  years.forEach(year => {
+    const opt = document.createElement("option");
+    opt.value = year;
+    opt.textContent = year;
+    yearSelect.appendChild(opt);
   });
 
   quarters.forEach(q => {
-    let opt = document.createElement("option");
+    const opt = document.createElement("option");
     opt.value = q;
     opt.textContent = q;
-    document.getElementById("quarter").appendChild(opt);
+    quarterSelect.appendChild(opt);
   });
 
-  states.forEach(s => {
-    let opt = document.createElement("option");
-    opt.value = s;
-    opt.textContent = s;
-    document.getElementById("state").appendChild(opt);
+  states.forEach(state => {
+    const opt = document.createElement("option");
+    opt.value = state;
+    opt.textContent = state;
+    stateSelect.appendChild(opt);
   });
 
-  // Set default to most recent
-  document.getElementById("year").value = "2025";
-  document.getElementById("quarter").value = "Q2";
-  document.getElementById("state").value = "US Average";
+  // Default values
+  yearSelect.value = "2025";
+  quarterSelect.value = "Q2";
+  stateSelect.value = "US Average";
 
-  fetch("egg_prices_2016_2025.csv")
-    .then(response => response.text())
-    .then(csv => {
-      const rows = csv.trim().split("\n").map(r => r.split(","));
-      const headers = rows[0];
-      const data = rows.slice(1).map(r => {
-        let obj = {};
-        headers.forEach((h, i) => {
-          obj[h] = i === 0 ? r[i] : parseFloat(r[i]);
-        });
-        return obj;
-      });
+  const csvFile = "egg_prices_2016_2025.csv";
 
-      drawChart(data);
-      updatePrice(data);
+  async function fetchDataAndPlot() {
+    const year = yearSelect.value;
+    const quarter = quarterSelect.value;
+    const state = stateSelect.value;
 
-      document.getElementById("getData").addEventListener("click", () => {
-        updatePrice(data);
-      });
+    const response = await fetch(csvFile);
+    const text = await response.text();
+    const rows = text.trim().split("\n").slice(1);
+    const labels = [];
+    const prices = [];
+
+    let selectedPrice = null;
+
+    rows.forEach(row => {
+      const [qtr, us, ca, fl, tx] = row.split(",");
+      labels.push(qtr);
+      let value = null;
+
+      switch (state) {
+        case "California": value = parseFloat(ca); break;
+        case "Florida": value = parseFloat(fl); break;
+        case "Texas": value = parseFloat(tx); break;
+        default: value = parseFloat(us); break;
+      }
+
+      prices.push(value);
+
+      if (qtr === `${year}-${quarter}`) {
+        selectedPrice = value;
+      }
     });
 
-  function updatePrice(data) {
-    const year = document.getElementById("year").value;
-    const quarter = document.getElementById("quarter").value;
-    const state = document.getElementById("state").value;
-    const selected = `${year}-${quarter}`;
+    priceOutput.textContent = `Egg prices for ${state}, ${quarter}-${year}: $${selectedPrice?.toFixed(2) || "N/A"} per dozen`;
 
-    const found = data.find(row => row.Quarter === selected);
-    const output = document.getElementById("priceOutput");
-
-    if (found) {
-      output.innerText = `Egg prices for ${state}, ${selected}: $${found[state].toFixed(2)} per dozen.`;
-    } else {
-      output.innerText = `No data available for ${state}, ${selected}.`;
-    }
+    drawChart(labels, prices);
   }
 
-  function drawChart(data) {
-    const ctx = document.getElementById("priceChart").getContext("2d");
-    const quarters = data.map(row => row.Quarter);
-    const prices = data.map(row => row["US Average"]);
+  function drawChart(labels, data) {
+    if (window.eggChartInstance) {
+      window.eggChartInstance.destroy();
+    }
 
-    new Chart(ctx, {
+    const ctx = chartCanvas.getContext("2d");
+    window.eggChartInstance = new Chart(ctx, {
       type: "line",
       data: {
-        labels: quarters,
+        labels,
         datasets: [{
           label: "Egg price $ (per dozen)",
-          data: prices,
+          data,
           fill: false,
-          borderColor: "#facc15", // yellow
-          tension: 0.3,
-          pointBackgroundColor: "#facc15"
+          borderColor: "#facc15",
+          tension: 0.2,
+          pointRadius: 4,
+          pointBackgroundColor: "#facc15",
         }]
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: { display: true }
+        },
         scales: {
           y: {
-            beginAtZero: false,
-            min: 1,
-            max: 6,
             title: {
               display: true,
               text: "$ per dozen"
-            }
+            },
+            beginAtZero: false
           },
           x: {
             title: {
@@ -103,16 +119,14 @@ document.addEventListener("DOMContentLoaded", () => {
               text: "Quarter"
             }
           }
-        },
-        plugins: {
-          legend: {
-            labels: {
-              color: "#444"
-            }
-          }
         }
       }
     });
   }
+
+  getDataBtn.addEventListener("click", fetchDataAndPlot);
+
+  // Auto-load on page open
+  fetchDataAndPlot();
 });
 
